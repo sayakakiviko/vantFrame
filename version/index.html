@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="bookmark" href="/favicon.ico" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="stylesheet" href="./version.css" />
+  <script src="./iconfont.js"></script>
+  <script>
+    // 版本跳转页。根据后端返回的不同版本，跳转到对应的版本中。
+    // var AUTH_LINT = '/gzcx/api/message/who' // 这里写who接口的地址，一般是API上下文+who。
+    var AUTH_LINT = '/xxqf/api/message/who' // 这里写who接口的地址，一般是API上下文+who。
+  </script>
+</head>
+
+<body>
+  <div class="content" id="loading">
+  </div>
+  <div id="result" class="hide">
+    <svg class="icon" aria-hidden="true">
+      <use xlink:href="#icon-jinggao"></use>
+    </svg>
+    <div class="weui-msg__text-area">
+      <h2 class="weui-msg__title">访问出错</h2>
+      <p class="weui-msg__desc">
+        <p id="errorInfo">访问地址缺少必要参数</p>
+      </p>
+    </div>
+  </div>
+  <!-- <script src="static/zepto.min.js"></script> -->
+  <script src="/vue-vendor/axios/0.16.2/axios.min.js"></script>
+  <script>
+    function getUrlToken () {
+      var QueryString = {}
+      var search = window.location.search
+      if (search) {
+        search = search.substring(1)
+        var a = search.split('&')
+        for (var i = 0; i < a.length; i++) {
+          var as = a[i].split('=')
+          if (as.length > 1) {
+            QueryString[as[0]] = as[1]
+          }
+        }
+      }
+      return QueryString
+    }
+    function getToken (fn, errorCallback, isLogin) {
+      var QueryString = getUrlToken()
+      if (QueryString.token) {  // 如果有token,则该token存在url中或者微信获取后保存的
+        window.sessionStorage.setItem('querystring', JSON.stringify(QueryString))
+        fn(QueryString)
+      }
+      else if (QueryString.host && isLogin) {
+        window.sessionStorage.setItem('querystring', JSON.stringify(QueryString))
+        fn(QueryString)
+      }
+      else if (QueryString.corpid && QueryString.code) {  // 从微信中获取
+        axios.get('/qyapi/who?' + 'corpid=' + QueryString.corpid + '&code=' + QueryString.code + '&noCache=' + (new Date().getTime()))
+          .then(function (res) {
+            if (res && res.data && res.data.token && res.data.apiServer) {
+              res.data.host = res.data.apiServer
+              QueryString = res.data
+              window.sessionStorage.setItem('querystring', QueryString)
+              fn(res.data)
+            }
+            else {
+              errorCallback({
+                message: '你未获得授权，请联系管理员'
+              })
+            }
+          })
+          .catch(function () {
+            errorCallback({
+              message: '连接认证服务器失败，请稍后重试'
+            })
+          })
+      }
+      else {   // 如果URL上没有参数，从sessionStorage取初次进入app的参数。如果也没有，则表示是第一次进入app就没有带必要的参数
+        var querystring = window.sessionStorage.getItem('querystring')
+        try {
+          querystring = JSON.parse(querystring)
+          if (querystring && querystring.token) {
+            fn(querystring)
+          }
+          else {
+            errorCallback({
+              message: '访问地址缺少必要参数'
+            })
+          }
+        }
+        catch (e) {
+          errorCallback({
+            message: '访问地址缺少必要参数'
+          })
+        }
+      }
+    }
+    getToken(function (result) {
+      axios.get(AUTH_LINT, {
+        headers: {
+          'Authorization': 'bearer ' + result.token,
+          'x-api-server': result.host
+        }
+      })
+      .then(function (res) {
+        if (res.data) {
+          var data = res.data
+          if (data && data.version) {
+            var version = data.version // data.version.split('.').splice(0, 2).join('.')
+            var location = window.location // 统一处理，将参数存入sessionStorage中的querystring，用于解决带有参数进入页面的时候，出现的参数冲突的问题
+            window.location.replace(location.protocol + '//' + location.host + location.pathname + version + '/?token=' + result.token + '&host=' + result.host)
+          }
+          else {
+            var location = window.location
+            window.location.replace(location.protocol + '//' + location.host + location.pathname + '/1.0.0/?token=' + result.token + '&host=' + result.host)
+          }
+        }
+      })
+      .catch(function (e) {
+        var location = window.location
+        window.location.replace(location.protocol + '//' + location.host + location.pathname + '/1.0.0/?token=' + result.token + '&host=' + result.host)
+      })
+    }, function (msg) {
+      document.getElementById('loading').className = 'content hide'
+      document.getElementById('result').className = ''
+      document.getElementById('errorInfo').innerHTML = msg.message
+    })
+  </script>
+</body>
+
+</html>

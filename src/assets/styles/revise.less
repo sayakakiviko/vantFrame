@@ -1,0 +1,142 @@
+@import "base";
+body{
+    line-height: normal;
+    //background: #e6ecea;
+}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+p,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+button,
+input,
+textarea,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+body,
+button,
+input,
+select,
+textarea {
+  font-family: 'helvetica neue', tahoma, 'hiragino sans gb', stheiti, 'wenquanyi micro hei', '微软雅黑', '宋体', sans-serif;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: #535353;
+}
+a:hover {
+  text-decoration: none;
+  outline: 0;
+}
+a:active {
+  outline: 0;
+}
+img {
+  border: 0;
+}
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ellipsis-clamp-1,
+.ellipsis-clamp-2,
+.ellipsis-clamp-3,
+.ellipsis-clamp-4,
+.ellipsis-clamp-5 {
+  overflow: hidden;
+  display: -webkit-box;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+}
+
+.ellipsis-clamp-1 {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.ellipsis-clamp-2 {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.ellipsis-clamp-3 {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.ellipsis-clamp-4 {
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.ellipsis-clamp-5 {
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+/* 修正html根字体对弹层的影响*/
+.weui-dialog, .weui-toast{
+    font-size: 14px;
+}
+.weui-tab__panel{
+    padding-bottom: 96 / @rem;
+}
+.vux-header{
+    .vux-header-left{
+        left: 20 / @rem;
+        top: 20 / @rem;
+        color: #fff;
+        z-index: 2;
+    }
+}
+.vux-header-title-area, .vux-header .vux-header-title{
+    height: 80 / @rem;
+    .fz(38);
+    line-height: 80 / @rem;
+}
+.weui-tabbar{
+    background: #fff;
+    box-shadow: #ecf0f1 0 0 6 / @rem 1 / @rem;
+}
+.weui-tabbar__label{
+    color: #666666;
+    .fz(24);
+    line-height: 42 / @rem;
+}
+.weui-tabbar__icon{
+    width: auto;
+    height: 44 / @rem;
+    img{
+        width: auto;
+    }
+}
+.weui-tabbar__item{
+    padding-top: 11 / @rem;
+}
+.weui-grid__icon{
+    width: auto;
+    height: auto;
+}
+
